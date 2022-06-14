@@ -3,6 +3,8 @@ import ClassCounter from './components/ClassCounter';
 import Counter from './components/Counter';
 import PostItem from './components/PostItem';
 import PostList from './components/PostList';
+import MyButton from './components/UI/button/MyButton';
+import MyInput from './components/UI/input/MyInput';
 import './styles/App.css';
 
 function App() {
@@ -13,9 +15,31 @@ function App() {
         { id: 3, title: 'somesing3', body: 'SOMESING_3' }
     ])
 
+    const [title, setTitle] = React.useState('')
+    const bodyInputRef = React.useRef();
+
+    const addNewPost = (e) => {
+        e.preventDefault()
+        console.log(bodyInputRef.current.value)
+
+    }
 
   return (
       <div className="App">
+          <form>
+              {/*управляемый компонент*/}
+              <MyInput
+                  value={title}
+                  onChange={ e => setTitle(e.target.value)}
+                  type="text"
+                  placeholder='название поста' />
+              {/*неуправляемый компонент*/}
+              <MyInput
+                  ref={bodyInputRef}
+                  type="text"
+                  placeholder='описание поста' />
+              <MyButton onClick={addNewPost}>создать пост</MyButton>
+          </form>
           <PostList posts={posts} title={"Список постов"} />
       </div>
   );
