@@ -9,33 +9,33 @@ import './styles/App.css';
 
 function App() {
 
-    const [posts, setPost] = React.useState([
+    const [posts, setPosts] = React.useState([
         { id: 1, title: 'somesing1', body: 'SOMESING_1' },
         { id: 2, title: 'somesing2', body: 'SOMESING_2' },
         { id: 3, title: 'somesing3', body: 'SOMESING_3' }
     ])
 
-    const [title, setTitle] = React.useState('')
-    const bodyInputRef = React.useRef();
+    const [post, setPost] = React.useState({ title:'',body:''})
+  
 
     const addNewPost = (e) => {
         e.preventDefault()
-        console.log(bodyInputRef.current.value)
-
+        setPosts([...posts, { ...post, id: Date.now() }])
+        setPost({ title: '', body: '' })
     }
 
   return (
       <div className="App">
           <form>
-              {/*управляемый компонент*/}
+  
               <MyInput
-                  value={title}
-                  onChange={ e => setTitle(e.target.value)}
+                  value={post.title}
+                  onChange={e => setPost({ ...post, title: e.target.value })}
                   type="text"
                   placeholder='название поста' />
-              {/*неуправляемый компонент*/}
               <MyInput
-                  ref={bodyInputRef}
+                  value={post.body}
+                  onChange={e => setPost({ ...post, body: e.target.value })}
                   type="text"
                   placeholder='описание поста' />
               <MyButton onClick={addNewPost}>создать пост</MyButton>
