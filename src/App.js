@@ -17,7 +17,21 @@ function App() {
         { id: 3, title: 'bfbhf', body: 'bbb' }
     ])
 
-    const [selectedSort,setSelectedSort]= React.useState('')
+    const [selectedSort, setSelectedSort] = React.useState('')
+    const [searchQuery, setSearchQuery] = React.useState('')
+
+
+    const sortedPosts = React.useMemo(() => {
+        if (selectedSort) {
+            return [...posts].sort((a, b) => a[selectedSort].localeCompare(b[selectedSort]))
+        }
+        return posts;   
+    }, [selectedSort, posts])
+    
+    const sortedAndSearchedPosts = React.useMemo(() => {
+        return sortedPosts.filter(post => post.title.toLowerCase().includes(searchQuery))
+    },[searchQuery,sortedPosts])
+
 
     const createPost = (newPost) => {
         setPosts([...posts,newPost])
@@ -29,7 +43,6 @@ function App() {
 
     const sortPost = (sort) => {
         setSelectedSort(sort);
-        setPosts([...posts].sort((a,b)=>a[sort].localeCompare(b[sort])))
     }
 
   return (
@@ -37,6 +50,10 @@ function App() {
           <PostForm create={createPost} />
           <hr style={{margin: '15px 0' }}/>
           <div>
+              <MyInput
+                  value={searchQuery}
+                  onChange={e=>setSearchQuery(e.target.value)}
+                  placeholder='Поиск' />
               <MySelect
                   value={selectedSort}
                   onChange={sortPost}
@@ -47,9 +64,9 @@ function App() {
                   ]}
               />
           </div>
-          {posts.length 
+          {sortedAndSearchedPosts.length 
               ?
-              <PostList remove={removePost} posts={posts} title={"Список постов"} />
+              <PostList remove={removePost} posts={sortedAndSearchedPosts} title={"Список постов"} />
               :
               <h1 style={{ textAlign: 'center' }}>
                   Пости не найдены
