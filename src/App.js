@@ -1,24 +1,21 @@
-import React, { useEffect } from 'react';
-import ClassCounter from './components/ClassCounter';
-import Counter from './components/Counter';
-import PostItem from './components/PostItem';
+import React, { useEffect, useState } from 'react';
 import PostList from './components/PostList';
 import MyButton from './components/UI/button/MyButton';
-import MyInput from './components/UI/input/MyInput';
 import PostForm from './components/PostForm';
-import MySelect from './components/UI/select/MySelect';
 import PostFilter from './components/PostFilter';
 import './styles/App.css';
 import MyModal from './components/UI/MyModal/MyModal';
 import {usePosts} from './hooks/usePost.js';
-import axios from 'axios';
 import PostService from './API/PostService';
+import Loader from './components/UI/Loader/Loader';
+
 
 function App() {
     const [posts, setPosts] = React.useState([]);
     const [filter, setFilter] = React.useState({ sort: '', query: '' });
     const [modal, setModal] = React.useState(false);
     const sortedAndSearchedPosts = usePosts(posts, filter.sort, filter.query);
+    const [isPostsLoading, setIsPostsLoading]=useState(false)
 
     useEffect(() => {
         fetchPosts() 
@@ -30,8 +27,10 @@ function App() {
     }
 
     async function fetchPosts() {
+        setIsPostsLoading(true);
         const posts = await PostService.getAll();
-        setPosts(posts)
+        setPosts(posts);
+        setIsPostsLoading(false)
     }
 
     const removePost = (post) => {
@@ -52,7 +51,12 @@ function App() {
               filter={filter}
               setFilter={setFilter}
           />
-          <PostList remove={removePost} posts={sortedAndSearchedPosts} title={"Список постов"} />
+          {isPostsLoading
+              ? <div style={{display:'flex',justifyContent:'center',marginTop:'50px'}}><Loader /></div>
+              : <PostList remove={removePost} posts={sortedAndSearchedPosts} title={"Список постов"} />
+              
+          }
+         
       </div>
   );
 }
