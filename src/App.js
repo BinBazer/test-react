@@ -12,6 +12,7 @@ import './styles/App.css';
 import MyModal from './components/UI/MyModal/MyModal';
 import {usePosts} from './hooks/usePost.js';
 import axios from 'axios';
+import PostService from './API/PostService';
 
 function App() {
     const [posts, setPosts] = React.useState([]);
@@ -29,8 +30,8 @@ function App() {
     }
 
     async function fetchPosts() {
-        const response = await axios.get('https://jsonplaceholder.typicode.com/posts')
-        setPosts(response.data)
+        const posts = await PostService.getAll();
+        setPosts(posts)
     }
 
     const removePost = (post) => {
