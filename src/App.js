@@ -1,29 +1,41 @@
 import React, { useEffect, useState } from 'react';
+import './styles/App.css';
+import { usePosts } from './hooks/usePost.js';
+import { useFetching } from './hooks/useFetching';
+import { getPageArray, getPageCount } from './utils/pages';
 import PostList from './components/PostList';
 import MyButton from './components/UI/button/MyButton';
 import PostForm from './components/PostForm';
 import PostFilter from './components/PostFilter';
-import './styles/App.css';
 import MyModal from './components/UI/MyModal/MyModal';
-import {usePosts} from './hooks/usePost.js';
 import PostService from './API/PostService';
 import Loader from './components/UI/Loader/Loader';
-import { useFetching } from './hooks/useFetching';
+import Pagination from './components/UI/pagination/Pagination';
+
+
 
 
 function App() {
-    const [posts, setPosts] = React.useState([]);
-    const [filter, setFilter] = React.useState({ sort: '', query: '' });
-    const [modal, setModal] = React.useState(false);
+    const [posts, setPosts] = useState([]);
+    const [filter, setFilter] = useState({ sort: '', query: '' });
+    const [modal, setModal] = useState(false);
     const sortedAndSearchedPosts = usePosts(posts, filter.sort, filter.query);
+    const [totalPages, setTotalPages] = useState(0)
+    const [limit, setLimit] = useState(5)
+    const [page, setPage] = useState(1)
+    
+
     const [fetchPosts, isPostsLoading, postError] = useFetching(async () => {
-        const posts = await PostService.getAll();
-        setPosts(posts);
+        const response = await PostService.getAll(limit, page);
+        setPosts(response.data);
+        const totalCount = response.headers['x-total-count'];
+        setTotalPages(getPageCount(totalCount,limit))
     })
+    
 
     useEffect(() => {
         fetchPosts() 
-    },[])
+    },[page])
     
     const createPost = (newPost) => {
         setPosts([...posts, newPost])
@@ -33,6 +45,10 @@ function App() {
 
     const removePost = (post) => {
         setPosts(posts.filter(p=>p.id !== post.id))
+    }
+
+    const changePage = (page) => {
+        setPage(page)
     }
 
 
@@ -57,6 +73,11 @@ function App() {
               : <PostList remove={removePost} posts={sortedAndSearchedPosts} title={"Список постов"} />
               
           }
+          <Pagination
+              page={page}
+              changePage={changePage}
+              totalPages={totalPages}
+          />
          
       </div>
   );
