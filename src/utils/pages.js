@@ -9,3 +9,4 @@ export const getPageArray = (totalPages) => {
     };
     return result;
 }
+
