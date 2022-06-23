@@ -4,10 +4,10 @@ export const useFetching = (callbakc) => {
     const [isLoading, setIsLoading] = useState(false)
     const [error, setError] = useState('')
     
-    const fetching = async () => {
+    const fetching = async (...args) => {
         try {
             setIsLoading(true)
-            await callbakc()
+            await callbakc(...args)
         } catch (e) {
             setError(e.message)
         } finally {
