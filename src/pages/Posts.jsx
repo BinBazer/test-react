@@ -1,5 +1,5 @@
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import MyButton from './../components/UI/button/MyButton';
 import MyModal from './../components/UI/MyModal/MyModal';
 import PostFilter from './../components/PostFilter';
@@ -12,6 +12,7 @@ import PostService from './../API/PostService';
 import { usePosts } from '../hooks/usePost';
 import { useFetching } from './../hooks/useFetching';
 import PostForm from './../components/PostForm';
+import { useObserver } from './../hooks/useObserver';
 
 
 
@@ -24,14 +25,21 @@ function Posts() {
     const [modal, setModal] = useState(false);
     const sortedAndSearchedPosts = usePosts(posts, filter.sort, filter.query);
     const [totalPages, setTotalPages] = useState(0)
-    const [limit, setLimit] = useState(5)
+    const [limit, setLimit] = useState(10)
     const [page, setPage] = useState(1)
+    const laseElement = useRef()
+ 
+    
 
     const [fetchPosts, isPostsLoading, postError] = useFetching(async () => {
         const response = await PostService.getAll(limit, page);
-        setPosts(response.data);
+        setPosts([...posts, ...response.data]);
         const totalCount = response.headers['x-total-count'];
         setTotalPages(getPageCount(totalCount, limit))
+    })
+
+    useObserver(laseElement, page < totalPages, isPostsLoading, () => {
+        setPage(page + 1)
     })
 
     useEffect(() => {
@@ -49,6 +57,7 @@ function Posts() {
 
     const changePage = (page) => {
         setPage(page)
+
     }
 
     return (
@@ -67,9 +76,10 @@ function Posts() {
             {postError &&
                 <h1>Произошла ошибка ${postError}</h1>
             }
-            {isPostsLoading
-                ? <div style={{ display: 'flex', justifyContent: 'center', marginTop: '50px' }}><Loader /></div>
-                : <PostList remove={removePost} posts={sortedAndSearchedPosts} title={"Список постов"} />
+            <PostList remove={removePost} posts={sortedAndSearchedPosts} title={"Список постов"} />
+            <div ref={laseElement} style={{ height: 20, background: 'red'}}></div>
+            {isPostsLoading &&
+                <div style={{ display: 'flex', justifyContent: 'center', marginTop: '50px' }}><Loader /></div>
             }
             <Pagination
                 page={page}
