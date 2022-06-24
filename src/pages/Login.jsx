@@ -7,7 +7,8 @@ const Login = () => {
     const {isAuth, setIsAuth} = useContext(AuthContext)
     const login = event => {
         event.preventDefault();
-        setIsAuth(true)
+        setIsAuth(true);
+        localStorage.setItem('auth','true')
 
     }
     return (
