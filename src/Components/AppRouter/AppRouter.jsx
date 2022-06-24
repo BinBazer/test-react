@@ -1,15 +1,16 @@
 import React from 'react';
+import { useContext } from 'react';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
-import About from './../../pages/About';
-import Posts from './../../pages/Posts';
-import PostsIdPage from './../../pages/PostsIdPage';
-import { routes } from './../../router/index';
+import { privateRoutes, publicRoutes } from './../../router/index';
+import { AuthContext } from './../../context/index';
 
 const AppRouter = () => { 
+    const {isAuth, setIsAuth } = useContext(AuthContext);
     return (
-        <div>
+        isAuth
+            ?
             <Routes>
-                {routes.map(route =>                    
+                {privateRoutes.map(route =>                    
                     < Route
                         key={route.key}
                         element={route.element }
@@ -17,8 +18,19 @@ const AppRouter = () => {
                         exact = { route.exact }
                     />
                 )}
-            </Routes>  
-        </div>
+            </Routes>
+            :
+            <Routes>
+                {publicRoutes.map(route =>
+                    < Route
+                        key={route.key}
+                        element={route.element}
+                        path={route.path}
+                        exact={route.exact}
+                    />
+                )}
+            </Routes>
+
     )
 }
 
